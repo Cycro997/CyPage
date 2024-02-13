@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<!-- HTML -->
+<html lang="en">
+    <meta charset="UTF-8"> 
+    <link rel="stylesheet" href="$libraries/lib.css">
+    <head>
+        <title class="title main">Game</title>
+        <h1 class="title main">Game</h1>
+    </head>
+    <body>
+        <div id="sidebar">
+            <button id="sidebarHide" onclick="sideBarManager.hide.all()">Hide</button>
+            <div class="sbdiv">
+                <button onclick="sideBarManager.hide.otherpages()">Other pages</button>
+                <span id="sidebarOtherpages" style="display:none">
+                    <object width="100" height="150" data="$libraries/context/contextOtherpages.html"></object>
+                </span>
+            </div>
+        </div>
+        <button id="sidebarShow" onclick="sideBarManager.hide.all()">Show</button>
+<div class="main">
+        <div class="main">
+        <p>Game thing</p><hr>
+        <p title="pStats">
+            <span id="highscore" title="highest score you have ever achieved">Highscore: </span>
+        </p>
+        <p title="Stats">
+            <span id="score" title="The amount of points you have">Score: 1000</span> - 
+            <span id="moves" title="How many times you moved">Moves: 0</span> -
+            <span id="gold" title="The amount of gold you collected">Gold: 0</span>
+        </p>
+    <div id="grid" title="grid">
+        <span id="gridOccupied"></span> <!--add 212 to top and 110 to left-->
+        <span id="gridGold"></span>
+    </div>
+
+        <!--Buttons--> <br>
+        <button class="movecontrol" onclick="move(-1,-1)">↖</button>
+        <button class="movecontrol" onclick="move(0,-1)">↑ </button>
+        <button class="movecontrol" onclick="move(1,-1)">↗</button> <br>
+        <button class="movecontrol" onclick="move(-1,0)">←</button>
+        <button class="movecontrol" >·</button>
+        <button class="movecontrol" onclick="move(1,0)">→</button> <br>
+        <button class="movecontrol" onclick="move(-1,1)">↙</button>
+        <button class="movecontrol" onclick="move(0,1)">↓</button>
+        <button class="movecontrol" onclick="move(1,1)">↘</button>
+        <!--Other--> <br>
+        <p id="gameover" title="Game over"></p>
+</div>
+    </body>
+</html> 
+<!-- CSS -->
+<style>
+#gridOccupied {
+    height: 25px; width: 25px;
+    background-color: black;
+    display: inline-block;
+    outline: solid darkgray 2px;
+    position: absolute;
+    z-index: 1;
+}
+#gridGold {
+    height: 25px; width: 25px;
+    background-color: yellow;
+    outline: gold solid 2px;
+    display: inline-block;
+    position: absolute;
+
+}
+.movecontrol {
+    border-color: black;
+    background-color: white;
+    width: 25px; height: 25px;
+    margin-bottom: 2px;
+    border-radius: 20%;
+}
+.movecontrol:hover {
+    background-color: lightgray;
+}
+.movecontrol:active {
+    background-color: gray;
+}
+#grid {
+    background-color: white;
+    width: 261px; height: 260px;
+    outline: black solid;
+}
+</style>
+<!--style 2--><style>
+#sidebar {
+    height: 100%;
+    width: 140px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #FFFFFF;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    margin-left: 0px;
+    padding: 10px;
+    display: none;
+    font-size: 85%;
+}
+.main {
+    margin-left: 50px;
+}
+#sidebarShow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin: 10px;
+    display: inline-block;
+}
+</style>
+<!-- JS -->
+<script src="$libraries/lib.js"> </script>
+<script>
+"use strict";
+const obj={x:0,y:0};
+const gold={x:3,y:4};
+let score=1000, moves=0, gold2=0, highestScore=1000;
+function gridmargin(){
+    let x= Number(document.styleSheets[2].cssRules[1].style["margin-left"].slice(0,-2));
+    if (x!=50){x+=110}
+    return x
+}
+
+if (localStorage.getItem("highscore")==null){
+    localStorage.setItem("highscore", "0");
+}
+setInterval(function(){
+    document.getElementById('gridOccupied').style.left=(obj.x*25)+60+gridmargin()+"px";
+    document.getElementById('gridOccupied').style.top=(obj.y*25)+212+"px";
+    document.getElementById('gridGold').style.left=(gold.x*25)+60+gridmargin()+"px";
+    document.getElementById('gridGold').style.top=(gold.y*25)+212+"px";
+},1)
+function move(x,y) {
+    if (score<=0) {location.reload()}
+    if (inbounds({x:obj.x+x,y:obj.y+y})) {
+        obj.x+=x; obj.y+=y; 
+        document.getElementById('gridOccupied').style.left=(obj.x*25)+60+gridmargin()+"px";
+        document.getElementById('gridOccupied').style.top=(obj.y*25)+212+"px";
+        console.log("obj.x:"+obj.x+",obj.y:"+obj.y)
+        if (collision(obj)==gold) {
+            scoreAdd(Math.round(Math.random()*100+250+(gold2*12.5)-(moves*1.15)));
+            goldAdd(1);
+            do {gold.x=Math.floor(Math.random()*10);
+                gold.y=Math.floor(Math.random()*10);
+            } while (collision(obj)==gold)
+            document.getElementById('gridGold').style.left=(gold.x*25)+60+gridmargin()+"px";
+                document.getElementById('gridGold').style.top=(gold.y*25)+212+"px";
+            }
+        movesAdd(1);
+        scoreAdd(-25 - Math.floor(moves/2.5));
+    }
+}
+function scoreAdd(n) {
+    score+=n;
+    if ((score>=10000) && (score<10000000)) {
+        document.getElementById("score").innerHTML="Score: "+(Math.floor(score/10)/100)+"K";
+    } else {document.getElementById("score").innerHTML="Score: "+score;}
+    console.log("score:"+score+"("+n+")")
+    if (score<=0) {
+        document.getElementById("gameover").innerHTML="Game over <br> Highest score: "+highestScore;
+        console.log("game over")
+        if (Number(localStorage.getItem("highscore"))<Number(highestScore)){
+            localStorage.setItem("highscore",highestScore);
+            console.log("New high score:"+localStorage.getItem("highscore"));
+        }
+        document.getElementById("highscore").innerHTML="Highscore: "+localStorage.getItem("highscore");
+        alert("Game over"); 
+    }
+    if (highestScore<score) {highestScore=score; console.log("Highest score:"+highestScore)}
+}
+function movesAdd(n) {
+    moves+=n;
+    document.getElementById("moves").innerHTML="Moves: "+moves;
+    console.log("moves:"+moves+"("+n+")")
+}
+function goldAdd(n) {
+    gold2+=n;
+    document.getElementById("gold").innerHTML="Gold: "+gold2;
+    console.log("gold:"+gold2+"("+n+")")
+}
+if (localStorage.getItem("highscore")==null) {
+    document.cookie = "highscore=0; SameSite=None; secure=True"
+}
+document.getElementById("highscore").innerHTML="Highscore: "+localStorage.getItem("highscore");
+const debug = {}
+function collision(o){
+    let collideswith=[]
+    if ((o.x==gold.x)&&(o.y==gold.y) && (o!=gold)){
+        collideswith.push(gold)
+    } else if ((o.x==obj.x)&&(o.y==obj.y) && (o!=obj)){
+        collideswith.push(obj)
+    }
+    return collideswith
+}
+function inbounds(o){
+    if (((o.x)>=0) && ((o.y)>=0) && ((o.x)<=9) && ((o.y)<=9)) {
+        return true
+    } else {
+        return false
+    }
+}
+</script>
