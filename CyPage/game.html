@@ -30,20 +30,18 @@
             <span id="gold" title="The amount of gold you collected">Gold: 0</span>
         </p>
     <div id="grid" title="grid">
-        <span id="gridOccupied"></span> <!--add 212 to top and 110 to left-->
-        <span id="gridGold"></span>
     </div>
 
         <!--Buttons--> <br>
-        <button class="movecontrol" onclick="move(-1,-1)">↖</button>
-        <button class="movecontrol" onclick="move(0,-1)">↑ </button>
-        <button class="movecontrol" onclick="move(1,-1)">↗</button> <br>
-        <button class="movecontrol" onclick="move(-1,0)">←</button>
+        <button class="movecontrol" onclick="obj.move(-1,-1)">↖</button>
+        <button class="movecontrol" onclick="obj.move(0,-1)">↑ </button>
+        <button class="movecontrol" onclick="obj.move(1,-1)">↗</button> <br>
+        <button class="movecontrol" onclick="obj.move(-1,0)">←</button>
         <button class="movecontrol" >·</button>
-        <button class="movecontrol" onclick="move(1,0)">→</button> <br>
-        <button class="movecontrol" onclick="move(-1,1)">↙</button>
-        <button class="movecontrol" onclick="move(0,1)">↓</button>
-        <button class="movecontrol" onclick="move(1,1)">↘</button>
+        <button class="movecontrol" onclick="obj.move(1,0)">→</button> <br>
+        <button class="movecontrol" onclick="obj.move(-1,1)">↙</button>
+        <button class="movecontrol" onclick="obj.move(0,1)">↓</button>
+        <button class="movecontrol" onclick="obj.move(1,1)">↘</button>
         <!--Other--> <br>
         <p id="gameover" title="Game over"></p>
 </div>
@@ -51,21 +49,24 @@
 </html> 
 <!-- CSS -->
 <style>
-#gridOccupied {
+game-obj {
     height: 25px; width: 25px;
-    background-color: black;
     display: inline-block;
-    outline: solid darkgray 2px;
     position: absolute;
+}
+[objid=obj] {
+    background-color: black;
+    outline: solid darkgray 2px;
     z-index: 1;
 }
-#gridGold {
-    height: 25px; width: 25px;
+[objid~=gold] {
     background-color: yellow;
     outline: gold solid 2px;
-    display: inline-block;
-    position: absolute;
-
+}
+[objtype~=wall] {
+    background-color: gray;
+    outline: lightgray solid 2px;
+    z-index: 1;
 }
 .movecontrol {
     border-color: black;
@@ -84,6 +85,7 @@
     background-color: white;
     width: 261px; height: 260px;
     outline: black solid;
+    position: relative;
 }
 </style>
 <!--style 2--><style>
@@ -95,12 +97,13 @@
     top: 0;
     left: 0;
     background-color: #FFFFFF;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-x: auto;
+    overflow-y: auto;
     margin-left: 0px;
     padding: 10px;
     display: none;
     font-size: 85%;
+    outline: 2px solid black;
 }
 .main {
     margin-left: 50px;
@@ -115,45 +118,37 @@
 </style>
 <!-- JS -->
 <script src="$libraries/lib.js"> </script>
+<script src="$libraries/CJBLP.js"> </script>
 <script>
 "use strict";
-const obj={x:0,y:0};
-const gold={x:3,y:4};
 let score=1000, moves=0, gold2=0, highestScore=1000;
-function gridmargin(){
-    let x= Number(document.styleSheets[2].cssRules[1].style["margin-left"].slice(0,-2));
-    if (x!=50){x+=110}
-    return x
-}
 
 if (localStorage.getItem("highscore")==null){
     localStorage.setItem("highscore", "0");
 }
-setInterval(function(){
-    document.getElementById('gridOccupied').style.left=(obj.x*25)+60+gridmargin()+"px";
-    document.getElementById('gridOccupied').style.top=(obj.y*25)+212+"px";
-    document.getElementById('gridGold').style.left=(gold.x*25)+60+gridmargin()+"px";
-    document.getElementById('gridGold').style.top=(gold.y*25)+212+"px";
-},1)
 function move(x,y) {
     if (score<=0) {location.reload()}
-    if (inbounds({x:obj.x+x,y:obj.y+y})) {
-        obj.x+=x; obj.y+=y; 
-        document.getElementById('gridOccupied').style.left=(obj.x*25)+60+gridmargin()+"px";
-        document.getElementById('gridOccupied').style.top=(obj.y*25)+212+"px";
-        console.log("obj.x:"+obj.x+",obj.y:"+obj.y)
-        if (collision(obj)==gold) {
-            scoreAdd(Math.round(Math.random()*100+250+(gold2*12.5)-(moves*1.15)));
-            goldAdd(1);
-            do {gold.x=Math.floor(Math.random()*10);
-                gold.y=Math.floor(Math.random()*10);
-            } while (collision(obj)==gold)
-            document.getElementById('gridGold').style.left=(gold.x*25)+60+gridmargin()+"px";
-                document.getElementById('gridGold').style.top=(gold.y*25)+212+"px";
-            }
-        movesAdd(1);
-        scoreAdd(-25 - Math.floor(moves/2.5));
-    }
+    if (collision(obj).includes(gold)) {
+        scoreAdd(Math.round(Math.random()*100+250+(gold2*12.5)-(moves*1.15)));
+        goldAdd(1);
+        do {gold.attr.x=Math.floor(Math.random()*10);
+            gold.attr.y=Math.floor(Math.random()*10);
+        } while (collision(gold).includes(obj) || collision(gold).includes(wall) || collision(gold).includes(wall2))
+            document.querySelector("[objid=gold]").style.left=(gold.attr.x*25)+"px";
+            document.querySelector("[objid=gold]").style.top=(gold.attr.y*25)+"px";
+        do {wall.attr.x=Math.floor(Math.random()*10);
+            wall.attr.y=Math.floor(Math.random()*10);
+        } while (collision(wall).includes(obj) || collision(wall).includes(gold) || collision(wall).includes(wall2))
+            document.querySelector("[objid=wall]").style.left=(wall.attr.x*25)+"px";
+            document.querySelector("[objid=wall]").style.top=(wall.attr.y*25)+"px";
+        do {wall2.attr.x=Math.floor(Math.random()*10);
+            wall2.attr.y=Math.floor(Math.random()*10);
+        } while (collision(wall2).includes(obj) || collision(wall2).includes(gold) || collision(wall2).includes(wall))
+            document.querySelector("[objid=wall]").style.left=(wall.attr.x*25)+"px";
+            document.querySelector("[objid=wall]").style.top=(wall.attr.y*25)+"px";
+        }
+    movesAdd(1);
+    scoreAdd(-25 - Math.floor(moves/2.5));
 }
 function scoreAdd(n) {
     score+=n;
@@ -188,20 +183,106 @@ if (localStorage.getItem("highscore")==null) {
 }
 document.getElementById("highscore").innerHTML="Highscore: "+localStorage.getItem("highscore");
 const debug = {}
-function collision(o){
-    let collideswith=[]
-    if ((o.x==gold.x)&&(o.y==gold.y) && (o!=gold)){
+function collision(o, mode="byobj"){
+    let collideswith=[];
+    let collidetypes=[];
+    if ((o.attr.x==gold.attr.x)&&(o.attr.y==gold.attr.y) && (o!=gold)){
         collideswith.push(gold)
-    } else if ((o.x==obj.x)&&(o.y==obj.y) && (o!=obj)){
+        collidetypes.push(gold.attr.type)
+    } else if ((o.attr.x==obj.attr.x)&&(o.attr.y==obj.attr.y) && (o!=obj)){
         collideswith.push(obj)
+        collidetypes.push(obj.attr.type)
+    } else if ((o.attr.x==wall.attr.x)&&(o.attr.y==wall.attr.y) && (o!=wall)){
+        collideswith.push(wall)
+        collidetypes.push(wall.attr.type)
+    } else if ((o.attr.x==wall2.attr.x)&&(o.attr.y==wall2.attr.y) && (o!=wall2)){
+        collideswith.push(wall2)
+        collidetypes.push(wall2.attr.type)
     }
-    return collideswith
+    if (mode=="byobj"){
+        return collideswith
+    } else if (mode=="bytype"){
+        return collidetypes
+    } else {
+        return undefined
+    }
 }
 function inbounds(o){
-    if (((o.x)>=0) && ((o.y)>=0) && ((o.x)<=9) && ((o.y)<=9)) {
+    if (((o.attr.x)>=0) && ((o.attr.y)>=0) && ((o.attr.x)<=9) && ((o.attr.y)<=9)) {
         return true
     } else {
         return false
     }
 }
+class gameobj{
+    #attr; #events; #data; #id; #element
+    constructor(id,attr={},events={},data={}){
+        if (id==undefined) {throw SyntaxError("Attribute id is not defined")}
+        if (typeof id!= "string") {throw TypeError("Attribute id is not a string")}
+        this.#attr=attr, this.#events=events, this.#data=data, this.#id=id;
+        this.#element=document.createElement("game-obj");
+        this.#element.setAttribute("objid",id);
+        this.#element.setAttribute("objtype",attr.type);
+        document.getElementById("grid").appendChild(this.element);
+        const thisobj=this;
+        setInterval(function(){
+            document.querySelector(`[objid=${id}]`).style.left=(thisobj.attr.x*25)+"px";
+            document.querySelector(`[objid=${id}]`).style.top=(thisobj.attr.y*25)+"px";
+        },1)
+        /*
+        id (required): an identifier for the object
+        attr: object attributes
+            x: x position
+            y: y position
+            solid: object is solid
+            type: object type [player,gold,wall]
+        events: functions to run on events
+            onmove: runs on every move attempt
+            onmovesuccess: runs on every successful move attempt
+            onmovefail: runs on every failed move attempt
+        data: custom data you can use
+        */
+    }
+    move(x,y) {
+        let success=true;
+        this.attr.x+=x; this.attr.y+=y; 
+        if (this.events.onmove instanceof Function){this.events.onmove(x,y)}
+        if (this.attr.solid==1) {
+            const collide=collision(this);
+            const solidcollision=[];
+            for (let i of collide){
+                    if(i.attr.solid==true){
+                    success=false;
+                    break;
+                }
+            }
+        }
+        if (! inbounds(this)) {
+            success=false
+        }
+        if (success==true) {
+            
+            document.querySelector(`[objid=${this.id}]`).style.left=(obj.attr.x*25)+"px";
+            document.querySelector(`[objid=${this.id}]`).style.top=(obj.attr.y*25)+"px";
+            if (this.events.onmovesuccess instanceof Function){this.events.onmovesuccess(x,y)}
+        }
+        else {
+            this.attr.x-=x; this.attr.y-=y; 
+            if (this.events.onmovefail instanceof Function){this.events.onmovefail(x,y)}
+        }
+    
+    }
+    get attr() {return this.#attr};
+    set attr(o) {this.#attr};
+    get events() {return this.#events};
+    get data() {return this.#data};
+    get id() {return this.#id};
+    get element() {return this.#element};
+}
+
+const obj=new gameobj("obj",{x:0,y:0,solid:1,type:"player"},{onmovesuccess:move},{})
+,gold=new gameobj("gold",{x:3,y:4,solid:0,type:"gold"},{},{})
+,wall=new gameobj("wall",{x:1,y:3,solid:1,type:"wall"},{},{})
+,wall2=new gameobj("wall2",{x:2,y:4,solid:1,type:"wall"},{},{})
+;
 </script>

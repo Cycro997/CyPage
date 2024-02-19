@@ -20,9 +20,10 @@
         <button id="sidebarShow" onclick="sideBarManager.hide.all()">Show</button>
         <div class="main">
         Github: <a class="hl" href="https://www.github.com/cycro997/cypage">https://www.github.com/cycro997/cypage</a> <br>
-        Current: <i>Version 1.0</i> <br> 
+        Current: <i>Version 1.1</i> <br> 
         Hover or click for update info <br>
         <button title="Released 12-02-2024&#10;Released this website to the public" onclick="alert(this.innerHTML+'\n'+this.title)">Version 1.0</button><br>
+        <button title="Released 19-02-2024&#10;Some improvements to the game&#10;StyleScript added in a module called CJBLP" onclick="alert(this.innerHTML+'\n'+this.title)">Version 1.1</button><br>
         </div>
     </body>
 </html>
@@ -37,12 +38,13 @@
     top: 0;
     left: 0;
     background-color: #FFFFFF;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-x: auto;
+    overflow-y: auto;
     margin-left: 0px;
     padding: 10px;
     display: none;
     font-size: 85%;
+    outline: 2px solid black;
 }
 .main {
     margin-left: 50px;
@@ -56,6 +58,7 @@
 }
 </style>
 <script src="$libraries/lib.js"> </script>
+<script src="$libraries/CJBLP.js"> </script>
 <script>
 "use strict";
 </script>

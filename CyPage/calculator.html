@@ -104,12 +104,13 @@
     top: 0;
     left: 0;
     background-color: #FFFFFF;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-x: auto;
+    overflow-y: auto;
     margin-left: 0px;
     padding: 10px;
     display: none;
     font-size: 85%;
+    outline: 2px solid black;
 }
 .main {
     margin-left: 50px;
@@ -124,6 +125,7 @@
 </style>
 <!-- JS --> 
 <script src="$libraries/lib.js"> </script>
+<script src="$libraries/CJBLP.js"> </script>
 <script>
 "use strict";
 document.getElementById('calcDisplay').value=0;

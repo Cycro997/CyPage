@@ -49,4 +49,10 @@ const sideBarManager={
         }
     }
 };
-sideBarManager.init.all()
+sideBarManager.init.all();
+
+function textToCSS(text){
+    const stylesheet=new CSSStyleSheet();
+    stylesheet.replace(text);
+    document.adoptedStyleSheets.push(stylesheet);
+}
