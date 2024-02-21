@@ -1,3 +1,3 @@
-# CyPage
-An html site made to use my HTML, CSS and JS knowledge
-I really hope you enjoy this collection of html pages
+# CJBLP<br>
+## _Cycro's JS based languages pack_<br>
+This is a JavaScript module for programming languages that are made using **JavaScript**
